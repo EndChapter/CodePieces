@@ -1,0 +1,22 @@
+.sh{
+    box-shadow: 0 4px 8px 0  #4BA8FF,  0 6px 20px 0 #4BA8FF!important
+}
+.card-c{
+    width: 200px;
+    height: 300px;
+    border: 1px #EB5E81 solid;
+    border-radius: 0.5rem;
+}
+.pos{
+    position: absolute;
+    margin-left: -100px !important;
+}
+.font{
+    font-family: sans-serif;
+}
+.btn-beyaz{
+    background-color: white;
+}
+.pdd{
+    padding: 15px !important;
+}

@@ -1,0 +1,200 @@
+<template>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <h3>Animation ve Transition</h3>
+        <select class="form-control" v-model="activeEffect">
+          <option value="fade">Fade</option>
+          <option value="slide">Slide</option>
+        </select>
+        <br>
+        <hr>
+        <button class="btn btn-primary" @click="show = !show">Kutuyu Göster/Gizle</button>
+        <br><br>
+        <transition :name="activeEffect">
+          <div class="alert alert-success" v-show="show">Bu bir alert kutusudur</div>
+        </transition>
+        <hr>
+        <transition name="slide" type="animation" appear>
+          <div class="alert alert-warning" v-show="!show">Bu bir alert kutusudur</div>
+        </transition>
+        <hr>
+        <transition
+                enter-class=""
+                enter-active-class="animated shake"
+                leave-class=""
+                leave-active-class="animated swing"
+                appear>
+
+          <div class="alert alert-warning" v-show="!show">Bu bir alert kutusudur</div>
+        </transition>
+        <hr>
+        <transition name="fade" mode="out-in">
+          <div class="alert alert-success" v-if="show" key="success">Bu bir alert kutusudur</div>
+          <div class="alert alert-danger" v-else key="danger">Bu bir alert kutusudur</div>
+        </transition>
+        <hr>
+        <button class="btn btn-primary" @click="showJs = !showJs">Kutuyu Göster/Gizle</button>
+        <br><br>
+        <transition
+                :css="false"
+          @before-enter="beforeEnter"
+          @enter="enter"
+          @after-enter="afterEnter"
+          @after-enter-cancelled="afterEnterCancelled"
+          @before-leave="beforeLeave"
+          @leave="leave"
+          @after-leave="afterLeave"
+          @after-leave-cancelled="afterLeaveCancelled"
+        >
+          <div style="width: 300px; background-color: #fbbd08; border: 1px solid #666; height: 100px" v-if="showJs">Bu bir alert kutusudur</div>
+        </transition>
+        <hr>
+        <h3>Dinamik Componentler Arasında Geçiş</h3>
+        <button class="btn btn-danger" @click="selectedComponent = 'appPost'">Post Componentine geç</button>
+        <button class="btn btn-primary" @click="selectedComponent = 'appHome'">Home Componentine geç</button>
+        <br><br>
+        <transition name="fade" mode="out-in">
+          <components :is="selectedComponent" ></components>
+        </transition>
+        <hr>
+        <button class="btn btn-danger" @click="addNewItem">Yeni Eleman Ekle</button>
+        <br><br>
+        <ul class="list-group" >
+          <transition-group name="slide">
+            <li class="list-group-item text-center" v-for="(number, index) in numberList" @click="removeItem(index)" :key="number">Number: {{number}}</li>
+          </transition-group>
+        </ul>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import Post from "./components/Post";
+import Home from "./components/Home";
+
+export default {
+  data(){
+    return{
+      show: false,
+      activeEffect:"fade",
+      showJs: false,
+      elementWidth: 100,
+      selectedComponent: "appPost",
+      numberList: [1, 2, 3, 4, 5],
+    }
+  },
+  components:{
+    appPost: Post,
+    appHome: Home
+  },
+  methods:{
+    removeItem(data){
+      this.numberList.splice(data, 1);
+    },
+    addNewItem(){
+      const position = Math.floor(Math.random()* this.numberList.length);
+      this.numberList.splice(position, 0, this.numberList.length +1)
+    },
+    beforeEnter(el){
+      console.log("beforeEnter");
+      this.elementWidth= 100;
+      el.style.width = this.elementWidth + "px";
+    },
+    enter(el, done){
+      console.log("enter");
+      let round = 1;
+      const interval =setInterval(()=>{
+        el.style.width = (this.elementWidth + round * 10) + "px";
+        round++;
+        if(round> 20)
+          clearInterval(interval);
+          done();
+      },50)
+      done();
+    },
+    afterEnter(el){
+      console.log("afterEnter")
+    },
+    afterEnterCancelled(el){
+      console.log("afterEnterCancelled")
+    },
+    beforeLeave(el){
+      console.log("beforeLeave");
+      this.elementWidth= 100;
+      el.style.width = this.elementWidth + "px";
+    },
+    leave(el, done){
+      console.log("leave");
+      let round = 1;
+      const interval =setInterval(()=>{
+        el.style.width = (this.elementWidth - round *10) + "px";
+        round++;
+        if(round> 20)
+          clearInterval(interval);
+        done();
+      },50)
+
+    },
+    afterLeave(el){
+      console.log("afterLeave")
+    },
+    afterLeaveCancelled(el){
+      console.log("afterLeaveCancelled")
+    },
+  }
+
+}
+</script>
+
+<style>
+  .fade-enter{
+    opacity: 0;
+  }
+  .fade-enter-active{
+    transition: opacity 1s ;
+  }
+  .fade-leave{
+    opacity: 1;
+  }
+  .fade-leave-active{
+    transition: opacity 1s;
+    opacity: 0;
+  }
+  .slide-enter{
+    opacity: 0;
+  }
+  .slide-enter-active{
+    animation: slide-in 1s linear forwards;
+    transition: opacity 0.5s;
+  }
+  .slide-leave{
+
+  }
+  .slide-leave-active{
+    animation: slide-out 1s linear forwards;
+    transition: opacity 3s;
+    opacity: 0;
+    position: absolute;
+  }
+  .slide-move{
+    transition: transform 1s;
+  }
+  @keyframes slide-in {
+    from{
+      transform: translateY(20px);
+    }
+    to{
+      transform: translateY(0px);
+    }
+  }
+  @keyframes slide-out {
+    from{
+      transform: translateY(0px);
+    }
+    to{
+      transform: translateY(20px);
+    }
+  }
+</style>

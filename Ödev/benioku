@@ -1,0 +1,2 @@
+resim upload kodunun çalışması için php.ini dosyasında 
+"file_uploads = On" yapılması gerekir
